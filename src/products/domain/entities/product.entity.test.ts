@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import { ProductEntity, ProductProps } from '@/product/domain/entities/product.entity';
+import { ProductEntity, ProductProps } from '@/products/domain/entities/product.entity';
 
 const makeProductProps = (overrides?: Partial<ProductProps>): ProductProps => ({
   name: 'Product Name',
@@ -44,17 +44,13 @@ describe('ProductEntity unit tests', () => {
     it('should throw when price is zero', () => {
       const props = makeProductProps({ price: 0 });
 
-      expect(() => new ProductEntity(props)).toThrow(
-        'Price must be greater than 0'
-      );
+      expect(() => new ProductEntity(props)).toThrow('Price must be greater than 0');
     });
 
     it('should throw when price is negative', () => {
       const props = makeProductProps({ price: -1 });
 
-      expect(() => new ProductEntity(props)).toThrow(
-        'Price must be greater than 0'
-      );
+      expect(() => new ProductEntity(props)).toThrow('Price must be greater than 0');
     });
   });
 
