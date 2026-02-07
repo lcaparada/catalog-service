@@ -9,6 +9,7 @@ export class ProductMongoDBRepository implements ProductRepository {
   private readonly collectionName = 'products';
 
   constructor(private readonly mongodb: Db) {}
+
   async insert(entity: ProductEntity): Promise<void> {
     try {
       const { id, ...props } = entity.toJSON();
@@ -20,7 +21,7 @@ export class ProductMongoDBRepository implements ProductRepository {
         updatedAt: props.updatedAt ?? now,
       });
     } catch (error) {
-      throw new Error('Error inserting product');
+      throw error;
     }
   }
 
@@ -35,7 +36,7 @@ export class ProductMongoDBRepository implements ProductRepository {
       return ProductModelMapperMongoDB.toDomain(product);
     } catch (error) {
       if (error instanceof NotFoundError) throw error;
-      throw new Error('Error finding product');
+      throw error;
     }
   }
 
@@ -47,7 +48,7 @@ export class ProductMongoDBRepository implements ProductRepository {
         .toArray();
       return products.map(ProductModelMapperMongoDB.toDomain);
     } catch (error) {
-      throw new Error('Error finding all products');
+      throw error;
     }
   }
 
@@ -55,7 +56,7 @@ export class ProductMongoDBRepository implements ProductRepository {
     try {
       await this.mongodb.collection(this.collectionName).deleteOne({ _id: new ObjectId(id) });
     } catch (error) {
-      throw new Error('Error deleting product');
+      throw error;
     }
   }
 
@@ -66,7 +67,7 @@ export class ProductMongoDBRepository implements ProductRepository {
         .collection<ProductModel>(this.collectionName)
         .updateOne({ _id: new ObjectId(entity.id) }, { $set: { ...props, updatedAt: new Date() } });
     } catch (error) {
-      throw new Error('Error updating product');
+      throw error;
     }
   }
 }
