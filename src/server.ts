@@ -2,6 +2,14 @@ import fastify from 'fastify';
 import { MongoDB } from '@/shared/infrastructure/db/mongodb/mongodb';
 import { getStatusCode } from '@/shared/presentation/http/error-handler';
 import { registerRoutes } from './products/presentation/routes';
+import {
+  jsonSchemaTransform,
+  serializerCompiler,
+  validatorCompiler,
+  type ZodTypeProvider,
+} from 'fastify-type-provider-zod';
+import swagger from '@fastify/swagger';
+import swaggerUi from '@fastify/swagger-ui';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -19,6 +27,24 @@ export function bootstrap() {
             },
           },
         },
+  }).withTypeProvider<ZodTypeProvider>();
+
+  app.setSerializerCompiler(serializerCompiler);
+  app.setValidatorCompiler(validatorCompiler);
+
+  app.register(swagger, {
+    openapi: {
+      info: {
+        title: 'Catalog Service API',
+        description: 'Catalog Service API',
+        version: '1.0.0',
+      },
+    },
+    transform: jsonSchemaTransform,
+  });
+
+  app.register(swaggerUi, {
+    routePrefix: '/docs',
   });
 
   app.setErrorHandler((error: Error, _request, reply) => {
@@ -31,6 +57,7 @@ export function bootstrap() {
       message: err.message,
     });
   });
+
   return app;
 }
 
