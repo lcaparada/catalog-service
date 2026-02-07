@@ -86,7 +86,7 @@ const start = async () => {
   await registerRoutes(app, db, eventPublisher);
   app.log.info('Routes registered');
   try {
-    await app.listen({ port: Number(process.env.PORT) });
+    await app.listen({ port: Number(process.env.PORT), host: "0.0.0.0" });
     app.log.info(`Server is running on ${process.env.PORT} 🔥`);
   } catch (err) {
     app.log.error(err);

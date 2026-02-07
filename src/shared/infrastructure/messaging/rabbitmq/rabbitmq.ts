@@ -2,6 +2,7 @@ import amqp, { Channel, ChannelModel } from 'amqplib';
 
 const EXCHANGE = 'catalog.events';
 const EXCHANGE_TYPE = 'topic';
+const QUEUE = 'catalog.events.queue';
 
 export class RabbitMQ {
   private static connection: ChannelModel | null = null;
@@ -13,6 +14,8 @@ export class RabbitMQ {
     await RabbitMQ.channel.assertExchange(EXCHANGE, EXCHANGE_TYPE, {
       durable: true,
     });
+    await RabbitMQ.channel.assertQueue(QUEUE, { durable: true });
+    await RabbitMQ.channel.bindQueue(QUEUE, EXCHANGE, 'catalog.product.#');
     return RabbitMQ.channel;
   }
 
