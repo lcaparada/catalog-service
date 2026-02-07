@@ -1,7 +1,7 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { InsertProductUseCase } from '@/products/application/useCases/insert-product.use-case';
 import { GetProductUseCase } from '@/products/application/useCases/get-product.use-case';
-import { ProductInputDto } from '@/products/application/dtos/product.input.dto';
+import { CreateProductSchemaType } from '../schemas/product.schemas';
 
 export class ProductController {
   constructor(
@@ -10,7 +10,7 @@ export class ProductController {
   ) {}
 
   async create(request: FastifyRequest, reply: FastifyReply) {
-    const body = request.body as ProductInputDto;
+    const body = request.body as CreateProductSchemaType;
     const { name, description, price, stock } = body;
     const product = await this.insertProductUseCase.execute({
       name,
@@ -18,7 +18,7 @@ export class ProductController {
       price,
       stock,
     });
-    return reply.code(201).send(product);
+    return reply.status(201).send(product);
   }
 
   async getById(request: FastifyRequest, reply: FastifyReply) {
