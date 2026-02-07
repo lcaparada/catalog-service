@@ -1,3 +1,4 @@
+import { EventPublisher } from '@/shared/application/events/event-publisher.interface';
 import { FastifyInstance } from 'fastify';
 import { ProductController } from '../controllers/product.controller';
 import { ProductMongoDBRepository } from '@/products/infrasctructure/repositories/product.mongodb.repository';
@@ -14,12 +15,25 @@ import {
 import { createProductSchema, productResponseSchema } from '../schemas/product.schemas';
 import z from 'zod';
 
-export async function productRoutes(app: FastifyInstance, db: Db) {
+export async function productRoutes(
+  app: FastifyInstance,
+  db: Db,
+  eventPublisher: EventPublisher
+) {
   const productRepository = new ProductMongoDBRepository(db);
-  const insertProductUseCase = new InsertProductUseCase(productRepository);
+  const insertProductUseCase = new InsertProductUseCase(
+    productRepository,
+    eventPublisher
+  );
   const getProductUseCase = new GetProductUseCase(productRepository);
-  const updateProductUseCase = new UpdateProductUseCase(productRepository);
-  const deleteProductUseCase = new DeleteProductUseCase(productRepository);
+  const updateProductUseCase = new UpdateProductUseCase(
+    productRepository,
+    eventPublisher
+  );
+  const deleteProductUseCase = new DeleteProductUseCase(
+    productRepository,
+    eventPublisher
+  );
   const productController = new ProductController(
     insertProductUseCase,
     getProductUseCase,

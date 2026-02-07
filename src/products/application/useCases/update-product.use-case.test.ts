@@ -11,16 +11,21 @@ const makeRepository = (): jest.Mocked<ProductRepository> => ({
   delete: jest.fn(),
 });
 
+const makeEventPublisher = () => ({
+  publish: jest.fn().mockResolvedValue(undefined),
+});
+
 describe('UpdateProductUseCase unit tests', () => {
   it('should find product, update props, call repository.update and return output', async () => {
     const repository = makeRepository();
+    const eventPublisher = makeEventPublisher();
     const entity = new ProductEntity(
       { name: 'Old', description: 'Old desc', price: 10, stock: 1 },
       'product-id'
     );
     (repository.findById as jest.Mock).mockResolvedValue(entity);
 
-    const useCase = new UpdateProductUseCase(repository);
+    const useCase = new UpdateProductUseCase(repository, eventPublisher);
     const input = {
       id: 'product-id',
       name: 'New Name',
@@ -53,7 +58,7 @@ describe('UpdateProductUseCase unit tests', () => {
       new NotFoundError('Product not found')
     );
 
-    const useCase = new UpdateProductUseCase(repository);
+    const useCase = new UpdateProductUseCase(repository, makeEventPublisher());
 
     await expect(
       useCase.execute({

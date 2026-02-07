@@ -10,10 +10,15 @@ const makeRepository = (): jest.Mocked<ProductRepository> => ({
   delete: jest.fn(),
 });
 
+const makeEventPublisher = () => ({
+  publish: jest.fn().mockResolvedValue(undefined),
+});
+
 describe('InsertProductUseCase unit tests', () => {
   it('should create product, insert via repository and return output', async () => {
     const repository = makeRepository();
-    const useCase = new InsertProductUseCase(repository);
+    const eventPublisher = makeEventPublisher();
+    const useCase = new InsertProductUseCase(repository, eventPublisher);
 
     const input = {
       name: 'Product',
@@ -41,11 +46,20 @@ describe('InsertProductUseCase unit tests', () => {
     expect(output.id).toBeDefined();
     expect(output.createdAt).toBeDefined();
     expect(output.updatedAt).toBeDefined();
+    expect(eventPublisher.publish).toHaveBeenCalledWith(
+      'catalog.product.created',
+      expect.objectContaining({
+        name: input.name,
+        description: input.description,
+        price: input.price,
+        stock: input.stock,
+      })
+    );
   });
 
   it('should throw when entity validation fails', async () => {
     const repository = makeRepository();
-    const useCase = new InsertProductUseCase(repository);
+    const useCase = new InsertProductUseCase(repository, makeEventPublisher());
 
     await expect(
       useCase.execute({

@@ -1,5 +1,9 @@
 import fastify from 'fastify';
+import { NoOpEventPublisher } from '@/shared/application/events/noop-event-publisher';
+import { EventPublisher } from '@/shared/application/events/event-publisher.interface';
 import { MongoDB } from '@/shared/infrastructure/db/mongodb/mongodb';
+import { RabbitMQ } from '@/shared/infrastructure/messaging/rabbitmq/rabbitmq';
+import { RabbitMQEventPublisher } from '@/shared/infrastructure/messaging/rabbitmq/rabbitmq-event-publisher';
 import { getStatusCode } from '@/shared/presentation/http/error-handler';
 import { registerRoutes } from './products/presentation/routes';
 import {
@@ -66,7 +70,20 @@ const start = async () => {
   const mongoUri = process.env.MONGO_URI ?? 'mongodb://localhost:27017';
   const db = await MongoDB.connect(mongoUri);
   app.log.info('MongoDB connected');
-  await registerRoutes(app, db);
+
+  let eventPublisher: EventPublisher = new NoOpEventPublisher();
+  const rabbitMqUri = process.env.RABBITMQ_URI;
+  if (rabbitMqUri) {
+    try {
+      await RabbitMQ.connect(rabbitMqUri);
+      eventPublisher = new RabbitMQEventPublisher();
+      app.log.info('RabbitMQ connected');
+    } catch (err) {
+      app.log.warn('RabbitMQ unavailable, events will not be published: %s', err);
+    }
+  }
+
+  await registerRoutes(app, db, eventPublisher);
   app.log.info('Routes registered');
   try {
     await app.listen({ port: Number(process.env.PORT) });

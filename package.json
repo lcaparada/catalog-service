@@ -16,6 +16,7 @@
     "@babel/preset-env": "^7.29.0",
     "@babel/preset-typescript": "^7.28.5",
     "@eslint/js": "^9.0.0",
+    "@types/amqplib": "^0.10.8",
     "@types/jest": "^30.0.0",
     "@types/node": "^25.2.1",
     "babel-jest": "^30.2.0",
@@ -32,6 +33,7 @@
   "dependencies": {
     "@fastify/swagger": "^9.7.0",
     "@fastify/swagger-ui": "^5.2.5",
+    "amqplib": "^0.10.9",
     "dotenv-cli": "^11.0.0",
     "fastify": "^5.7.4",
     "fastify-type-provider-zod": "^6.1.0",

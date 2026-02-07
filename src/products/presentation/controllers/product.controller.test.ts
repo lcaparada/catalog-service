@@ -1,4 +1,5 @@
 import { bootstrap } from '@/server';
+import { NoOpEventPublisher } from '@/shared/application/events/noop-event-publisher';
 import { MongoDB } from '@/shared/infrastructure/db/mongodb/mongodb';
 import { registerRoutes } from '@/products/presentation/routes';
 import { FastifyInstance } from 'fastify';
@@ -15,7 +16,7 @@ describe('ProductController Integration Tests', () => {
   beforeAll(async () => {
     app = bootstrap();
     db = await MongoDB.connect(mongoUri);
-    await registerRoutes(app, db);
+    await registerRoutes(app, db, new NoOpEventPublisher());
     await app.ready();
   });
 
