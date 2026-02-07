@@ -4,16 +4,19 @@ import { getStatusCode } from '@/shared/presentation/http/error-handler';
 import { registerRoutes } from './products/presentation/routes';
 
 export function bootstrap() {
+  const isTest = process.env.NODE_ENV === 'test';
   const app = fastify({
-    logger: {
-      transport: {
-        target: 'pino-pretty',
-        options: {
-          translateTime: 'HH:MM:ss Z',
-          ignore: 'pid,hostname',
+    logger: isTest
+      ? false
+      : {
+          transport: {
+            target: 'pino-pretty',
+            options: {
+              translateTime: 'HH:MM:ss Z',
+              ignore: 'pid,hostname',
+            },
+          },
         },
-      },
-    },
   });
 
   app.setErrorHandler((error: Error, _request, reply) => {
